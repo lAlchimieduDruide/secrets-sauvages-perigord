@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Les Secrets Sauvages du Périgord</title>
 <style>
-/* VERSION LUX INTRUS - FOND CASCADE */
+/* VERSION LUX INTRUS - FOND CASCADE + ESPACE MEMBRE SUPABASE */
 :root{--bg:#f5f2e8;--card:#fffdf6;--ink:#20352b;--accent:#477a52;--accent2:#8fa96a;--danger:#9d3f3f;--gold:#b58a3b}
 *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background-color:#183c2a;background-image:linear-gradient(rgba(12,38,24,.22),rgba(12,38,24,.34)),url("./fond-lux-intrus.png");background-size:cover;background-position:center center;background-repeat:no-repeat;background-attachment:fixed;color:var(--ink)}
 header{padding:18px 16px 12px;background:#244b34;color:white;position:sticky;top:0;z-index:5;box-shadow:0 2px 12px #0002}
@@ -32,6 +32,24 @@ input{width:100%;padding:14px;border:1px solid #cdd8c8;border-radius:14px;font-s
 footer{position:fixed;bottom:0;left:0;right:0;background:#fffdf6ee;backdrop-filter:blur(8px);border-top:1px solid #dfe6d7;padding:8px;z-index:7}
 footer nav{max-width:850px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}footer button{min-height:46px;padding:7px;font-size:12px;background:#edf2e8}
 @media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)} header h1{font-size:26px}}
+
+.authbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:10px}
+.authbar button{min-height:38px;padding:8px 12px;font-size:13px}
+.auth-card h2{margin:0 0 6px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.auth-tabs button.active{background:var(--accent);color:white}
+.auth-form{display:grid;gap:10px}
+.auth-form label{font-size:13px;font-weight:700;color:#40564a}
+.auth-form input{margin-top:5px}
+.auth-msg{margin-top:10px;padding:10px 12px;border-radius:10px;background:#edf2e8;font-size:13px;display:none}
+.auth-msg.error{display:block;background:#f9eaea;color:#7d2929}
+.auth-msg.ok{display:block;background:#e3f1e5;color:#285c34}
+.member-box{display:none;background:rgba(255,253,246,.92)}
+.member-row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.member-name{font-weight:800}
+.member-email{font-size:12px;color:#617268;word-break:break-all}
+.sync-state{font-size:12px;color:#617268}
+
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -43,11 +61,51 @@ footer nav{max-width:850px;margin:auto;display:grid;grid-template-columns:repeat
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
 <body>
 <header><h1>🌿 Les Secrets Sauvages du Périgord</h1><p>Jeu ethnobotanique • 50 plantes sauvages</p></header>
 <main>
 <section id="home" class="screen active">
+
+<div id="memberBox" class="card member-box">
+  <div class="member-row">
+    <div>
+      <div class="member-name">🧙 <span id="memberName">Membre</span></div>
+      <div id="memberEmail" class="member-email"></div>
+      <div id="syncState" class="sync-state">Progression locale</div>
+    </div>
+    <button class="danger" onclick="signOutMember()">Se déconnecter</button>
+  </div>
+</div>
+
+<div id="guestBox" class="card auth-card">
+  <h2>🌿 Espace membre</h2>
+  <p class="small">Crée un compte pour retrouver tes feuilles et tes parties sur tes appareils.</p>
+  <div class="auth-tabs">
+    <button id="loginTab" class="active" onclick="showAuthMode('login')">Se connecter</button>
+    <button id="signupTab" onclick="showAuthMode('signup')">S’inscrire</button>
+  </div>
+
+  <div id="signupNameWrap" style="display:none">
+    <label class="small"><b>Nom du druide</b>
+      <input id="authName" autocomplete="nickname" placeholder="Ex. Micha">
+    </label>
+  </div>
+
+  <div class="auth-form">
+    <label>Email
+      <input id="authEmail" type="email" autocomplete="email" placeholder="ton@email.fr">
+    </label>
+    <label>Mot de passe
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Au moins 6 caractères">
+    </label>
+    <button id="authSubmit" class="primary" onclick="submitAuth()">Se connecter</button>
+  </div>
+  <div id="authMsg" class="auth-msg"></div>
+</div>
+
 
 <div id="installCard" class="card" style="display:none;text-align:center">
   <h3 style="margin-top:0">📲 Installer l’application</h3>
@@ -105,6 +163,176 @@ const PLANTS = [{"name": "Ortie dioïque", "latin": "Urtica dioica", "habitat": 
 let quiz=[], qi=0, score=0, answered=false;
 let lifetime=Number(localStorage.getItem('perigord_points')||0);
 let games=Number(localStorage.getItem('perigord_games')||0);
+
+const SUPABASE_URL = "https://cdsoyapuzxkklsqzylyc.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qbmovvjpAvLUCLS3cz4uQA_QjCvyocB";
+const sbClient = window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : null;
+
+let currentMember = null;
+let authMode = "login";
+let syncTimer = null;
+
+function setAuthMessage(message, kind="") {
+  const el = document.getElementById("authMsg");
+  if (!el) return;
+  el.textContent = message || "";
+  el.className = "auth-msg" + (kind ? " " + kind : "");
+}
+
+function showAuthMode(mode) {
+  authMode = mode;
+  const isSignup = mode === "signup";
+  document.getElementById("signupNameWrap").style.display = isSignup ? "block" : "none";
+  document.getElementById("loginTab").classList.toggle("active", !isSignup);
+  document.getElementById("signupTab").classList.toggle("active", isSignup);
+  document.getElementById("authSubmit").textContent = isSignup ? "Créer mon compte" : "Se connecter";
+  const pwd = document.getElementById("authPassword");
+  if (pwd) pwd.autocomplete = isSignup ? "new-password" : "current-password";
+  setAuthMessage("");
+}
+
+async function submitAuth() {
+  if (!sbClient) {
+    setAuthMessage("Connexion membre indisponible hors ligne.", "error");
+    return;
+  }
+  const email = (document.getElementById("authEmail").value || "").trim();
+  const password = document.getElementById("authPassword").value || "";
+  const name = (document.getElementById("authName").value || "").trim();
+
+  if (!email || !password) {
+    setAuthMessage("Entre ton email et ton mot de passe.", "error");
+    return;
+  }
+  if (password.length < 6) {
+    setAuthMessage("Le mot de passe doit contenir au moins 6 caractères.", "error");
+    return;
+  }
+
+  const btn = document.getElementById("authSubmit");
+  btn.disabled = true;
+  btn.textContent = "Connexion…";
+
+  try {
+    if (authMode === "signup") {
+      const { data, error } = await sbClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            druid_name: name || "Druide du Périgord",
+            perigord_points: lifetime,
+            perigord_games: games
+          },
+          emailRedirectTo: "https://lalchimiedudruide.github.io/secrets-sauvages-perigord/"
+        }
+      });
+      if (error) throw error;
+
+      if (data.session) {
+        setAuthMessage("Compte créé et connecté ✅", "ok");
+      } else {
+        setAuthMessage("Compte créé ✅ Vérifie maintenant l’email de confirmation reçu dans ta boîte mail.", "ok");
+      }
+    } else {
+      const { error } = await sbClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      setAuthMessage("Connexion réussie ✅", "ok");
+    }
+  } catch (err) {
+    setAuthMessage(err?.message || "Impossible de se connecter.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === "signup" ? "Créer mon compte" : "Se connecter";
+  }
+}
+
+async function signOutMember() {
+  if (!sbClient) return;
+  await saveProgressToAccount();
+  await sbClient.auth.signOut();
+}
+
+function renderMemberState() {
+  const guest = document.getElementById("guestBox");
+  const member = document.getElementById("memberBox");
+  if (!guest || !member) return;
+
+  if (currentMember) {
+    guest.style.display = "none";
+    member.style.display = "block";
+    const name = currentMember.user_metadata?.druid_name || "Druide du Périgord";
+    document.getElementById("memberName").textContent = name;
+    document.getElementById("memberEmail").textContent = currentMember.email || "";
+  } else {
+    guest.style.display = "block";
+    member.style.display = "none";
+  }
+}
+
+async function mergeProgressFromAccount(user) {
+  if (!user) return;
+  const cloudPoints = Number(user.user_metadata?.perigord_points || 0);
+  const cloudGames = Number(user.user_metadata?.perigord_games || 0);
+
+  // On garde toujours la meilleure progression pour éviter d'écraser des gains locaux.
+  lifetime = Math.max(lifetime, cloudPoints);
+  games = Math.max(games, cloudGames);
+
+  localStorage.setItem("perigord_points", lifetime);
+  localStorage.setItem("perigord_games", games);
+  updateHome();
+
+  if (cloudPoints !== lifetime || cloudGames !== games) {
+    await saveProgressToAccount();
+  }
+}
+
+async function saveProgressToAccount() {
+  if (!sbClient || !currentMember) return;
+  const state = document.getElementById("syncState");
+  if (state) state.textContent = "Synchronisation…";
+  try {
+    const { data, error } = await sbClient.auth.updateUser({
+      data: {
+        ...currentMember.user_metadata,
+        perigord_points: lifetime,
+        perigord_games: games
+      }
+    });
+    if (error) throw error;
+    if (data?.user) currentMember = data.user;
+    if (state) state.textContent = "Progression sauvegardée dans ton compte ✅";
+  } catch (err) {
+    if (state) state.textContent = "Sauvegarde locale active • synchro à réessayer";
+    console.error("Progress sync:", err);
+  }
+}
+
+function scheduleProgressSync() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => saveProgressToAccount(), 700);
+}
+
+async function initMemberAuth() {
+  renderMemberState();
+  if (!sbClient) return;
+
+  const { data } = await sbClient.auth.getSession();
+  currentMember = data?.session?.user || null;
+  renderMemberState();
+  if (currentMember) await mergeProgressFromAccount(currentMember);
+
+  sbClient.auth.onAuthStateChange(async (_event, session) => {
+    currentMember = session?.user || null;
+    renderMemberState();
+    if (currentMember) await mergeProgressFromAccount(currentMember);
+    updateHome();
+  });
+}
+
 
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
 function showScreen(id){
@@ -190,6 +418,7 @@ function answer(btn,a){
  ${safe?'<div class="alert" style="margin-top:12px"><b>Plante à vigilance renforcée :</b> ne jamais valider une consommation à partir du jeu seul.</div>':''}
  </div>`;
  localStorage.setItem('perigord_points', lifetime);
+ scheduleProgressSync();
  document.getElementById('qscore').textContent=`Score ${score}`;
  document.getElementById('nextBtn').style.display='block';
 }
@@ -198,7 +427,7 @@ function nextQuestion(){
  else finish();
 }
 function finish(){
- games++;localStorage.setItem('perigord_games',games);
+ games++;localStorage.setItem('perigord_games',games); scheduleProgressSync();
  document.getElementById('quiz').innerHTML=`<div class="card hero"><div class="leaf">🏆</div><h2>${score}/10</h2>
  <p>${score>=9?'Druide du Périgord !':score>=7?'Très belle récolte de connaissances.':score>=5?'Bonne progression.':'Retour à l’herbier conseillé 🌿'}</p>
  <p><b>${lifetime} feuilles</b> au total • ${rank()}</p>
@@ -241,6 +470,7 @@ window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
 });
 document.addEventListener('DOMContentLoaded', () => {
+  initMemberAuth();
   const btn = document.getElementById('installBtn');
   if (btn) {
     btn.addEventListener('click', async () => {
