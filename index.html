@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Les Secrets Sauvages du Périgord</title>
+<style>
+:root{--bg:#f5f2e8;--card:#fffdf6;--ink:#20352b;--accent:#477a52;--accent2:#8fa96a;--danger:#9d3f3f;--gold:#b58a3b}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(180deg,#edf3e7,#f8f4e9);color:var(--ink)}
+header{padding:18px 16px 12px;background:#244b34;color:white;position:sticky;top:0;z-index:5;box-shadow:0 2px 12px #0002}
+header h1{font-size:22px;margin:0} header p{margin:4px 0 0;opacity:.9;font-size:13px}
+main{max-width:850px;margin:auto;padding:14px 14px 90px}
+.card{background:var(--card);border:1px solid #dfe6d7;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 5px 18px #27452d12}
+.hero{text-align:center;padding:24px 18px}.hero .leaf{font-size:64px}.hero h2{font-size:27px;margin:8px 0}.hero p{line-height:1.45}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+button{font:inherit;border:0;border-radius:14px;padding:14px 12px;min-height:52px;background:#e6eedf;color:var(--ink);font-weight:700;box-shadow:0 2px 6px #0001}
+button.primary{background:var(--accent);color:white} button.gold{background:var(--gold);color:white} button.danger{background:#f5dfdf;color:#7d2929}
+button:active{transform:scale(.98)} .small{font-size:13px;color:#5a6a60}.muted{color:#617268}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#e7eedf;font-size:12px;margin:3px 3px 3px 0}
+.screen{display:none}.screen.active{display:block}
+.question{font-size:22px;line-height:1.3;font-weight:800;margin:6px 0 14px}.answers{display:grid;gap:9px}.answers button{text-align:left;font-weight:650}
+.correct{background:#d9efdc!important}.wrong{background:#f3d7d7!important}
+.scorebar{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}.scorebar span{background:white;border-radius:999px;padding:7px 10px;font-size:13px}
+.plant-title{font-size:25px;margin:0}.latin{font-style:italic;color:#617268;margin-top:3px}
+.info h3{font-size:15px;margin:14px 0 4px}.info p{margin:0;line-height:1.45}
+.alert{border-left:5px solid var(--danger);background:#f9eaea;padding:12px;border-radius:10px;line-height:1.4}
+.notice{border-left:5px solid var(--gold);background:#f9f0d9;padding:12px;border-radius:10px;line-height:1.4}
+input{width:100%;padding:14px;border:1px solid #cdd8c8;border-radius:14px;font-size:16px;background:white}
+.listitem{padding:12px;border-bottom:1px solid #e6eadf;cursor:pointer}.listitem:last-child{border:0}.listitem b{font-size:16px}
+.progress{height:9px;background:#e3e8dd;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:var(--accent);width:0}
+footer{position:fixed;bottom:0;left:0;right:0;background:#fffdf6ee;backdrop-filter:blur(8px);border-top:1px solid #dfe6d7;padding:8px;z-index:7}
+footer nav{max-width:850px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}footer button{min-height:46px;padding:7px;font-size:12px;background:#edf2e8}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)} header h1{font-size:26px}}
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#244b34">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Secrets Sauvages">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+</head>
+<body>
+<header><h1>🌿 Les Secrets Sauvages du Périgord</h1><p>Jeu ethnobotanique • 50 plantes sauvages</p></header>
+<main>
+<section id="home" class="screen active">
+
+<div id="installCard" class="card" style="display:none;text-align:center">
+  <h3 style="margin-top:0">📲 Installer l’application</h3>
+  <p class="small">Ajoute Les Secrets Sauvages du Périgord sur l’écran d’accueil de ta tablette.</p>
+  <button id="installBtn" class="primary" style="width:100%">Installer sur la tablette</button>
+</div>
+
+ <div class="card hero"><div class="leaf">🌿</div><h2>Deviens Druide du Périgord</h2><p>Reconnaissance, usages alimentaires traditionnels, ethnobotanique, habitats et confusions.</p><div id="rank" class="badge"></div></div>
+ <div class="grid">
+  <button class="primary" onclick="startQuiz('recognition')">🔎 Qui suis-je ?</button>
+  <button onclick="startQuiz('edible')">🥗 Partie comestible</button>
+  <button onclick="startQuiz('habitat')">🌳 Habitat</button>
+  <button onclick="startQuiz('ethno')">📜 Ethnobotanique</button>
+  <button onclick="startQuiz('trad')">🌼 Usage traditionnel</button>
+  <button class="danger" onclick="startQuiz('conf')">⚠️ Confusions</button>
+  <button class="gold" onclick="startQuiz('mixed')">🏆 Défi du Druide</button>
+  <button onclick="showScreen('encyclo')">📚 Herbier des 50</button>
+ </div>
+ <div class="card">
+  <b>Progression</b><div class="progress" style="margin-top:9px"><i id="homeProgress"></i></div>
+  <p class="small" id="stats"></p>
+ </div>
+ <div class="notice"><b>Règle d’or :</b> ce jeu sert à apprendre, pas à valider une cueillette. Ne jamais consommer une plante sur la seule base d’une photo, d’une application ou d’un seul caractère. Les Apiacées et les plantes à confusions toxiques exigent une identification botanique certaine.</div>
+</section>
+
+<section id="quiz" class="screen">
+ <div class="scorebar"><span id="qcount"></span><span id="qscore"></span></div>
+ <div class="card"><div id="qcat" class="badge"></div><div id="question" class="question"></div><div id="answers" class="answers"></div></div>
+ <div id="feedback"></div>
+ <button id="nextBtn" class="primary" style="width:100%;display:none" onclick="nextQuestion()">Question suivante ➜</button>
+</section>
+
+<section id="encyclo" class="screen">
+ <div class="card"><h2 style="margin-top:0">📚 Herbier du Périgord</h2><input id="search" placeholder="Rechercher une plante…" oninput="renderList()"><p class="small">50 fiches intégrées, disponibles hors connexion.</p></div>
+ <div class="card" id="plantList"></div>
+</section>
+
+<section id="detail" class="screen"><div id="detailCard"></div></section>
+
+<section id="about" class="screen">
+ <div class="card"><h2>À propos du jeu</h2><p>Cette version présente des plantes sauvages ou subspontanées rencontrables en Dordogne et dans le Sud-Ouest. Les usages médicinaux sont présentés uniquement comme <b>usages traditionnels ou ethnobotaniques</b>, et non comme prescriptions ou promesses thérapeutiques.</p>
+ <div class="alert"><b>Sécurité cueillette :</b> certaines plantes comestibles ont des sosies toxiques. L’ail des ours et plusieurs Apiacées font partie des cas où une erreur peut être grave. En cas de doute : ne pas cueillir, ne pas goûter.</div>
+ <p class="small">Respecter également les propriétés privées, les zones protégées, les espèces protégées et les règles locales de cueillette.</p></div>
+</section>
+</main>
+<footer><nav>
+<button onclick="showScreen('home')">🏡<br>Accueil</button>
+<button onclick="startQuiz('mixed')">🎯<br>Jouer</button>
+<button onclick="showScreen('encyclo')">🌿<br>Herbier</button>
+<button onclick="showScreen('about')">ℹ️<br>Sécurité</button>
+</nav></footer>
+
+<script>
+const PLANTS = [{"name": "Ortie dioïque", "latin": "Urtica dioica", "habitat": "lisières, fossés, friches et sols riches en azote", "edible": "jeunes feuilles et jeunes pousses, généralement cuites", "trad": "aliment de printemps; usages traditionnels toniques et reminéralisants", "ethno": "Très ancienne plante alimentaire, textile et tinctoriale en Europe.", "conf": "Ne pas confondre avec les lamiers, qui ne piquent pas; la brûlure de l’ortie est un bon indice.", "season": "printemps à automne"}, {"name": "Pissenlit", "latin": "Taraxacum officinale agg.", "habitat": "prairies, pelouses, chemins et jardins", "edible": "jeunes feuilles, boutons floraux, fleurs et racine selon préparation", "trad": "salades de printemps; usages traditionnels digestifs", "ethno": "Les jeunes rosettes ont longtemps constitué une salade sauvage populaire.", "conf": "Plusieurs astéracées à rosette peuvent lui ressembler; vérifier la hampe creuse sans feuilles et le latex blanc.", "season": "presque toute l’année"}, {"name": "Plantain lancéolé", "latin": "Plantago lanceolata", "habitat": "prairies, chemins et pelouses", "edible": "jeunes feuilles, crues très jeunes ou cuites", "trad": "usage alimentaire; feuilles traditionnellement employées comme adoucissantes", "ethno": "Les boutons floraux ont une saveur parfois comparée au champignon.", "conf": "Reconnaissable à ses feuilles étroites marquées de nervures parallèles saillantes.", "season": "printemps à automne"}, {"name": "Grand plantain", "latin": "Plantago major", "habitat": "chemins piétinés, cours, pelouses et bords de routes", "edible": "jeunes feuilles, plutôt cuites lorsqu’elles durcissent", "trad": "usage alimentaire; tradition populaire pour les petits inconforts cutanés", "ethno": "Plante extrêmement liée aux passages humains et aux chemins.", "conf": "Feuilles larges en rosette, nervures épaisses presque parallèles.", "season": "printemps à automne"}, {"name": "Pâquerette", "latin": "Bellis perennis", "habitat": "pelouses, prés ras et jardins", "edible": "jeunes feuilles, boutons et fleurs en petites quantités", "trad": "usage alimentaire et traditionnel printanier", "ethno": "Son nom évoque sa présence fréquente autour de Pâques.", "conf": "Petite rosette basse; capitules blancs à cœur jaune.", "season": "presque toute l’année"}, {"name": "Achillée millefeuille", "latin": "Achillea millefolium", "habitat": "prairies, talus, pelouses sèches et chemins", "edible": "jeunes feuilles en petite quantité comme aromate", "trad": "plante amère et aromatique de la tradition européenne", "ethno": "Son nom renvoie à Achille; surnommée aussi herbe au charpentier.", "conf": "Feuilles très finement découpées; attention aux autres plantes à feuilles découpées.", "season": "printemps à automne"}, {"name": "Mauve sylvestre", "latin": "Malva sylvestris", "habitat": "friches, bords de chemins et terrains remués", "edible": "jeunes feuilles, fleurs et fruits immatures", "trad": "tradition alimentaire; mucilages associés à des usages adoucissants", "ethno": "Les petits fruits en disque sont parfois appelés « fromages ».", "conf": "Feuilles arrondies palmées et fleurs rose-violet veinées.", "season": "printemps à automne"}, {"name": "Petite mauve", "latin": "Malva neglecta", "habitat": "cours, friches, chemins et sols enrichis", "edible": "feuilles, fleurs et jeunes fruits", "trad": "aliment sauvage doux, riche en mucilages", "ethno": "Comme d’autres mauves, elle a été utilisée comme légume-feuille.", "conf": "Port plus étalé et fleurs plus petites que la mauve sylvestre.", "season": "printemps à automne"}, {"name": "Lierre terrestre", "latin": "Glechoma hederacea", "habitat": "haies, sous-bois frais, prairies ombragées", "edible": "feuilles en petite quantité comme aromate", "trad": "ancienne plante aromatique; usage traditionnel digestif", "ethno": "Avant la généralisation du houblon, il a servi à aromatiser certaines boissons.", "conf": "Tige carrée, feuilles opposées arrondies et odeur aromatique au froissement.", "season": "printemps à automne"}, {"name": "Alliaire officinale", "latin": "Alliaria petiolata", "habitat": "haies, lisières et sous-bois riches", "edible": "jeunes feuilles, fleurs et graines comme condiment", "trad": "condiment sauvage à saveur d’ail", "ethno": "Son odeur d’ail apparaît nettement quand on froisse les feuilles.", "conf": "Vérifier odeur d’ail et feuilles dentées; ne pas se fier à un seul critère.", "season": "printemps"}, {"name": "Ail des ours", "latin": "Allium ursinum", "habitat": "bois frais, ombragés et riches, souvent en colonies", "edible": "feuilles, fleurs et boutons lorsqu’identification certaine", "trad": "condiment sauvage; usages traditionnels proches de ceux de l’ail", "ethno": "Plante printanière emblématique des sous-bois frais.", "conf": "CONFUSION DANGEREUSE: muguet, colchique et parfois arum. Chaque feuille d’ail des ours doit être vérifiée individuellement; odeur d’ail utile mais non suffisante.", "season": "fin d’hiver et printemps"}, {"name": "Cardamine des prés", "latin": "Cardamine pratensis", "habitat": "prairies humides, fossés et bords de cours d’eau", "edible": "jeunes feuilles et fleurs comme condiment", "trad": "saveur piquante rappelant le cresson", "ethno": "Une des brassicacées sauvages typiques des prairies humides printanières.", "conf": "Fleurs à quatre pétales; vérifier la plante entière et l’habitat.", "season": "printemps"}, {"name": "Mouron des oiseaux", "latin": "Stellaria media", "habitat": "jardins, friches, cultures et sols frais", "edible": "jeunes parties aériennes, crues ou cuites", "trad": "salade sauvage douce", "ethno": "Très commune autour des lieux cultivés.", "conf": "CONFUSION: éviter tout mouron à fleurs rouges ou bleues (Anagallis/Lysimachia). Le vrai mouron des oiseaux porte de petites fleurs blanches profondément fendues.", "season": "automne à printemps"}, {"name": "Chénopode blanc", "latin": "Chenopodium album", "habitat": "cultures, jardins, friches et sols remués", "edible": "jeunes feuilles et pousses, plutôt cuites", "trad": "ancien légume-feuille proche des épinards", "ethno": "Des chénopodes ont été consommés comme légumes bien avant la diffusion moderne de l’épinard.", "conf": "Farine blanchâtre sur les jeunes feuilles; prudence avec les plantes de friches non identifiées.", "season": "printemps à automne"}, {"name": "Grande bardane", "latin": "Arctium lappa", "habitat": "friches, bords de chemins et terrains riches", "edible": "jeunes pétioles et racine de première année après préparation", "trad": "racine utilisée comme aliment dans plusieurs traditions", "ethno": "Ses capitules crochus ont inspiré le principe du Velcro.", "conf": "Vérifier les gros capitules à crochets et les grandes feuilles; ne pas récolter une racine sans identification certaine.", "season": "printemps à automne"}, {"name": "Ronce", "latin": "Rubus fruticosus agg.", "habitat": "haies, lisières, friches et clairières", "edible": "mûres; jeunes pousses tendres parfois utilisées", "trad": "fruit alimentaire; feuilles présentes dans des traditions de tisanes", "ethno": "Les mûres sauvages sont un aliment ancien très répandu en Europe.", "conf": "Éviter les fruits souillés au ras du sol ou au bord de routes fréquentées.", "season": "été à automne"}, {"name": "Églantier", "latin": "Rosa canina", "habitat": "haies, lisières, fourrés et talus", "edible": "cynorhodons mûrs après retrait soigneux des poils internes", "trad": "fruits utilisés en sirops, purées et infusions", "ethno": "Le cynorhodon est connu pour sa forte teneur en vitamine C.", "conf": "Les poils internes sont irritants; préparation minutieuse indispensable.", "season": "automne à hiver"}, {"name": "Aubépine monogyne", "latin": "Crataegus monogyna", "habitat": "haies, lisières, friches arbustives", "edible": "jeunes feuilles, fleurs en petite quantité et fruits cuits/préparés", "trad": "jeunes feuilles grignotées autrefois; plante majeure de la tradition herboriste européenne", "ethno": "Les jeunes feuilles ont parfois été surnommées « pain et fromage ».", "conf": "Arbuste épineux; ne pas confondre les fruits rouges avec ceux d’autres arbustes.", "season": "printemps à automne"}, {"name": "Sureau noir", "latin": "Sambucus nigra", "habitat": "haies, lisières, villages et sols riches", "edible": "fleurs; baies mûres généralement consommées après cuisson", "trad": "sirops, beignets, boissons et préparations traditionnelles", "ethno": "Arbuste très présent dans les traditions rurales européennes.", "conf": "CONFUSION IMPORTANTE: sureau hièble, herbacé et non arbustif. Les parties vertes et fruits crus en quantité sont à éviter.", "season": "printemps pour fleurs, fin d’été pour fruits"}, {"name": "Tilleul à petites feuilles", "latin": "Tilia cordata", "habitat": "boisements feuillus, lisières; aussi planté", "edible": "jeunes feuilles tendres et fleurs en infusion", "trad": "fleurs traditionnellement utilisées en tisane", "ethno": "Arbre social et symbolique fréquent près des places et villages.", "conf": "Identifier correctement le tilleul; éviter les arbres traités ou exposés à une forte pollution.", "season": "printemps à été"}, {"name": "Noisetier", "latin": "Corylus avellana", "habitat": "haies, lisières et sous-bois", "edible": "noisettes", "trad": "fruit alimentaire; feuilles utilisées dans certaines traditions populaires", "ethno": "La baguette de noisetier occupe une grande place dans le folklore européen.", "conf": "Chatons mâles pendants en hiver; noisettes entourées d’un involucre feuillu.", "season": "fin d’été à automne"}, {"name": "Châtaignier", "latin": "Castanea sativa", "habitat": "bois acides et anciennes châtaigneraies", "edible": "châtaignes cuites", "trad": "aliment farineux majeur dans de nombreuses campagnes", "ethno": "Le châtaignier fut parfois appelé « arbre à pain ».", "conf": "Ne pas confondre châtaigne et marron d’Inde: bogue du châtaignier très hérissée, fruits avec petite pointe.", "season": "automne"}, {"name": "Oseille commune", "latin": "Rumex acetosa", "habitat": "prairies fraîches et bords de chemins", "edible": "jeunes feuilles en petite quantité", "trad": "saveur acidulée utilisée en soupe et condiment", "ethno": "Son acidité vient notamment des oxalates.", "conf": "Consommation modérée en raison des oxalates; prudence chez les personnes à qui un professionnel a conseillé de les limiter.", "season": "printemps à automne"}, {"name": "Petite oseille", "latin": "Rumex acetosella", "habitat": "sols secs, acides, pelouses et landes", "edible": "petites feuilles en condiment, en petite quantité", "trad": "plante acidulée de cueillette", "ethno": "Très fréquente sur sols pauvres et acides.", "conf": "Comme les autres oseilles, consommation modérée en raison des oxalates.", "season": "printemps à automne"}, {"name": "Reine-des-prés", "latin": "Filipendula ulmaria", "habitat": "prairies humides, fossés et berges", "edible": "fleurs en petite quantité pour aromatiser", "trad": "plante aromatique traditionnelle; parfum d’amande/vanille selon perception", "ethno": "Elle contient des dérivés salicylés; son histoire est liée à celle des salicylates.", "conf": "Prudence pour les personnes sensibles aux salicylés; éviter les usages médicinaux sans conseil adapté.", "season": "été"}, {"name": "Pulmonaire officinale", "latin": "Pulmonaria officinalis", "habitat": "bois frais, haies ombragées et sols riches", "edible": "jeunes feuilles, traditionnellement cuites ou en petites quantités", "trad": "usage ancien lié à la « théorie des signatures »", "ethno": "Ses feuilles tachées ont été comparées autrefois à l’aspect des poumons.", "conf": "Feuilles souvent tachetées, fleurs passant du rose au bleu-violet; identification botanique nécessaire.", "season": "printemps"}, {"name": "Lamier blanc", "latin": "Lamium album", "habitat": "haies, talus, friches et sols riches", "edible": "jeunes feuilles et fleurs", "trad": "légume-feuille et infusion dans certaines traditions", "ethno": "Ressemble à une ortie mais ne pique pas; tige carrée typique des lamiacées.", "conf": "Fleurs blanches en verticilles; feuilles opposées et absence de poils urticants.", "season": "printemps à automne"}, {"name": "Lamier pourpre", "latin": "Lamium purpureum", "habitat": "jardins, cultures, friches et sols remués", "edible": "jeunes sommités et fleurs en petite quantité", "trad": "petite salade ou garniture sauvage", "ethno": "Une des premières fleurs communes de fin d’hiver.", "conf": "Sommet souvent pourpré, tige carrée, fleurs roses.", "season": "fin d’hiver à printemps"}, {"name": "Trèfle des prés", "latin": "Trifolium pratense", "habitat": "prairies, talus et bords de chemins", "edible": "fleurs et jeunes feuilles en petites quantités", "trad": "fleurs utilisées comme aliment et dans des traditions d’infusion", "ethno": "Fabacée fourragère importante, très liée aux prairies.", "conf": "Feuilles à trois folioles souvent marquées d’un croissant clair; fleurs rose pourpré.", "season": "printemps à automne"}, {"name": "Trèfle blanc", "latin": "Trifolium repens", "habitat": "pelouses, prairies et chemins", "edible": "fleurs et très jeunes feuilles en petites quantités", "trad": "usage alimentaire ponctuel et plante mellifère", "ethno": "Le trèfle à quatre feuilles est une mutation rare devenue symbole de chance.", "conf": "Port rampant, fleurs blanches vieillissant rosées.", "season": "printemps à automne"}, {"name": "Luzerne cultivée subspontanée", "latin": "Medicago sativa", "habitat": "prairies, bords de routes, friches et anciennes cultures", "edible": "jeunes pousses et fleurs en petites quantités", "trad": "surtout plante fourragère; usages alimentaires ponctuels", "ethno": "Cultivée depuis l’Antiquité comme fourrage.", "conf": "Ne pas récolter en bord de route ou parcelle traitée; fleurs violettes et feuilles trifoliées.", "season": "printemps à automne"}, {"name": "Chicorée sauvage", "latin": "Cichorium intybus", "habitat": "bords de chemins, talus secs et friches", "edible": "jeunes feuilles; racine torréfiée traditionnellement", "trad": "salades amères et substitut de café avec la racine", "ethno": "La racine de chicorée a longtemps été torréfiée pour préparer une boisson.", "conf": "Fleurs bleu vif sur tiges raides; latex blanc.", "season": "printemps à automne"}, {"name": "Égopode podagraire", "latin": "Aegopodium podagraria", "habitat": "haies, lisières, jardins frais et sous-bois riches", "edible": "jeunes feuilles lorsqu’identification certaine", "trad": "ancien légume sauvage; tradition liée à la goutte, d’où son nom", "ethno": "Son nom « podagraire » conserve la trace d’un ancien usage médicinal.", "conf": "CONFUSION DANGEREUSE possible avec d’autres Apiacées. Ne jamais consommer une Apiacée sur un seul critère.", "season": "printemps"}, {"name": "Carotte sauvage", "latin": "Daucus carota", "habitat": "prairies sèches, talus et bords de chemins", "edible": "racine jeune historiquement utilisée, fleurs/graines uniquement avec connaissances expertes", "trad": "ancêtre sauvage de la carotte cultivée", "ethno": "La carotte domestique dérive de formes sauvages apparentées.", "conf": "CONFUSION DANGEREUSE avec grande ciguë et autres Apiacées toxiques. Réservée aux personnes capables d’identifier les Apiacées avec certitude.", "season": "été"}, {"name": "Fenouil sauvage", "latin": "Foeniculum vulgare", "habitat": "talus secs, friches et bords de chemins chauds", "edible": "jeunes feuilles, fleurs et graines comme aromates", "trad": "plante aromatique et digestive traditionnelle", "ethno": "Très ancienne aromatique méditerranéenne naturalisée dans de nombreuses régions.", "conf": "Apiacée: odeur anisée très caractéristique mais l’odeur seule ne suffit jamais à identifier une plante.", "season": "été à automne"}, {"name": "Origan commun", "latin": "Origanum vulgare", "habitat": "talus secs, lisières ensoleillées et pelouses", "edible": "feuilles et sommités fleuries comme aromate", "trad": "condiment et tisane traditionnelle", "ethno": "Plante aromatique majeure du bassin méditerranéen et d’Europe.", "conf": "Tige souvent rougeâtre, feuilles opposées et inflorescences rosées.", "season": "été"}, {"name": "Serpolet", "latin": "Thymus serpyllum agg.", "habitat": "pelouses sèches, rocailles et talus ensoleillés", "edible": "feuilles et sommités fleuries comme aromate", "trad": "aromatique et tisane traditionnelle", "ethno": "Les petits thyms sauvages ont de nombreux noms locaux et formes proches.", "conf": "Vérifier odeur, feuilles opposées et port rampant; groupe botanique variable.", "season": "printemps à été"}, {"name": "Menthe aquatique", "latin": "Mentha aquatica", "habitat": "berges, fossés, prairies très humides", "edible": "feuilles comme aromate en petite quantité", "trad": "boissons et usages digestifs traditionnels", "ethno": "Les menthes ont une longue histoire alimentaire et médicinale.", "conf": "Tige carrée, feuilles opposées, forte odeur mentholée; nombreuses hybridations chez les menthes.", "season": "été"}, {"name": "Menthe à feuilles rondes", "latin": "Mentha suaveolens", "habitat": "fossés, prairies humides, bords de chemins frais", "edible": "feuilles comme aromate", "trad": "infusions et aromatisation traditionnelles", "ethno": "Une menthe sauvage très commune dans l’ouest et le sud-ouest.", "conf": "Feuilles arrondies et souvent duveteuses, odeur mentholée variable.", "season": "été"}, {"name": "Mélisse officinale subspontanée", "latin": "Melissa officinalis", "habitat": "haies, vieux jardins, lisières et lieux frais où elle s’est naturalisée", "edible": "feuilles comme aromate", "trad": "infusion citronnée traditionnellement consommée", "ethno": "Son nom vient du grec lié à l’abeille, rappelant son caractère mellifère.", "conf": "Odeur citronnée nette au froissement, feuilles opposées sur tige carrée.", "season": "printemps à automne"}, {"name": "Primevère officinale", "latin": "Primula veris", "habitat": "prairies, talus calcaires et lisières", "edible": "fleurs en petite quantité", "trad": "fleurs utilisées dans des boissons et préparations traditionnelles", "ethno": "Appelée coucou dans de nombreuses régions.", "conf": "Ne pas confondre avec des primevères horticoles; cueillette respectueuse et locale.", "season": "printemps"}, {"name": "Violette odorante", "latin": "Viola odorata", "habitat": "haies, bois clairs, talus ombragés", "edible": "fleurs et jeunes feuilles en petites quantités", "trad": "fleurs confites, sirops et traditions adoucissantes", "ethno": "La violette est liée depuis longtemps à la parfumerie et à la confiserie.", "conf": "Toutes les violettes ne sont pas odorantes; identifier l’espèce avant usage.", "season": "fin d’hiver à printemps"}, {"name": "Nombril-de-Vénus", "latin": "Umbilicus rupestris", "habitat": "vieux murs, rochers ombragés et lieux pierreux", "edible": "jeunes feuilles charnues, crues en petite quantité", "trad": "plante de cueillette locale; usages populaires externes historiques", "ethno": "Son nom vient de la dépression centrale de sa feuille ronde.", "conf": "Feuilles presque rondes, charnues, avec pétiole inséré près du centre.", "season": "hiver à printemps"}, {"name": "Porcelle enracinée", "latin": "Hypochaeris radicata", "habitat": "pelouses, prairies et chemins", "edible": "jeunes feuilles de rosette, généralement blanchies ou cuites si amères", "trad": "salade sauvage de rosette", "ethno": "Fait partie des nombreuses « salades sauvages » autrefois ramassées au printemps.", "conf": "Peut ressembler à d’autres astéracées jaunes; apprendre la rosette avant récolte.", "season": "printemps à automne"}, {"name": "Silène enflé", "latin": "Silene vulgaris", "habitat": "talus, prairies sèches et bords de chemins", "edible": "jeunes pousses avant floraison, cuites dans plusieurs traditions", "trad": "légume sauvage printanier dans certaines régions d’Europe", "ethno": "Son calice gonflé est un caractère très reconnaissable à la floraison.", "conf": "Récolter seulement après avoir appris à identifier la plante à différents stades.", "season": "printemps"}, {"name": "Bourse-à-pasteur", "latin": "Capsella bursa-pastoris", "habitat": "jardins, chemins, friches et cultures", "edible": "jeunes feuilles, fleurs et jeunes fruits en petites quantités", "trad": "salade sauvage et condiment léger", "ethno": "Le nom vient de ses fruits triangulaires évoquant une petite bourse.", "conf": "Petits fruits plats en forme de cœur/triangle sur la tige.", "season": "presque toute l’année"}, {"name": "Laiteron maraîcher", "latin": "Sonchus oleraceus", "habitat": "jardins, friches, cultures et murs", "edible": "jeunes feuilles et pousses, crues jeunes ou cuites", "trad": "ancien légume-feuille sauvage", "ethno": "Son nom d’espèce « oleraceus » rappelle son ancien statut de plante potagère.", "conf": "Latex blanc et feuilles embrassant la tige; distinguer des autres astéracées à latex.", "season": "printemps à automne"}, {"name": "Laiteron épineux", "latin": "Sonchus asper", "habitat": "friches, cultures et terrains remués", "edible": "très jeunes feuilles après préparation, plus coriaces que le laiteron maraîcher", "trad": "usage alimentaire populaire ponctuel", "ethno": "Proche du laiteron maraîcher mais à feuilles plus rigides et piquantes.", "conf": "Feuilles plus luisantes, dentées et épineuses; latex blanc.", "season": "printemps à automne"}, {"name": "Chardon-Marie", "latin": "Silybum marianum", "habitat": "friches, talus et terrains remués, localement naturalisé", "edible": "jeunes feuilles débarrassées des épines, pétioles et capitules selon préparation", "trad": "plante alimentaire et herboriste ancienne", "ethno": "Les marbrures blanches des feuilles sont à l’origine de nombreuses légendes.", "conf": "Grandes feuilles vertes fortement marbrées de blanc et bordées d’épines.", "season": "printemps à été"}, {"name": "Coquelicot", "latin": "Papaver rhoeas", "habitat": "cultures, friches et terrains remués", "edible": "jeunes rosettes avant floraison dans certaines traditions; pétales comme décoration", "trad": "jeunes feuilles autrefois cuites; pétales dans des préparations traditionnelles", "ethno": "Symbole des moissons et des paysages agricoles.", "conf": "Ne consommer que la plante correctement identifiée; éviter capsules et latex, et ne pas extrapoler aux autres pavots.", "season": "printemps à été"}];
+let quiz=[], qi=0, score=0, answered=false;
+let lifetime=Number(localStorage.getItem('perigord_points')||0);
+let games=Number(localStorage.getItem('perigord_games')||0);
+
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function showScreen(id){
+ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ if(id==='encyclo') renderList();
+ window.scrollTo(0,0); updateHome();
+}
+function rank(){
+ if(lifetime<100)return "🌱 Promeneur";
+ if(lifetime<300)return "🍃 Apprenti cueilleur";
+ if(lifetime<700)return "🌿 Herboriste du Périgord";
+ return "🧙 Druide du Périgord";
+}
+function updateHome(){
+ document.getElementById('rank').textContent=rank()+" • "+lifetime+" feuilles";
+ document.getElementById('stats').textContent=games+" parties terminées • "+lifetime+" feuilles gagnées";
+ document.getElementById('homeProgress').style.width=Math.min(100,lifetime/7)+"%";
+}
+const cats={
+ recognition:"Qui suis-je ?", edible:"Partie comestible", habitat:"Habitat",
+ ethno:"Ethnobotanique", trad:"Usage traditionnel", conf:"Confusions", mixed:"Défi du Druide"
+};
+function makeQ(p,type){
+ let prompt, correct, pool;
+ if(type==='recognition'){
+   prompt=`Je pousse dans ${p.habitat}. Ma saison principale : ${p.season}. Qui suis-je ?`;
+   correct=p.name; pool=PLANTS.map(x=>x.name);
+ } else if(type==='edible'){
+   prompt=`Pour ${p.name}, quelle proposition correspond à l’usage alimentaire traditionnel indiqué dans le jeu ?`;
+   correct=p.edible; pool=PLANTS.map(x=>x.edible);
+ } else if(type==='habitat'){
+   prompt=`Où rencontre-t-on typiquement ${p.name} ?`;
+   correct=p.habitat; pool=PLANTS.map(x=>x.habitat);
+ } else if(type==='ethno'){
+   prompt=`Quelle anecdote ethnobotanique correspond à ${p.name} ?`;
+   correct=p.ethno; pool=PLANTS.map(x=>x.ethno);
+ } else if(type==='trad'){
+   prompt=`Quel usage traditionnel est associé ici à ${p.name} ?`;
+   correct=p.trad; pool=PLANTS.map(x=>x.trad);
+ } else {
+   prompt=`Quelle précaution ou confusion faut-il retenir pour ${p.name} ?`;
+   correct=p.conf; pool=PLANTS.map(x=>x.conf);
+ }
+ let wrong=shuffle(pool.filter(x=>x!==correct)).slice(0,3);
+ return {p,type,prompt,correct,answers:shuffle([correct,...wrong])}
+}
+function startQuiz(type){
+ let types=type==='mixed'?['recognition','edible','habitat','ethno','trad','conf']:[type];
+ let picked=shuffle(PLANTS).slice(0,10);
+ quiz=picked.map(p=>makeQ(p,types[Math.floor(Math.random()*types.length)]));
+ qi=0;score=0;answered=false;showScreen('quiz');renderQ();
+}
+function renderQ(){
+ answered=false;
+ let q=quiz[qi];
+ document.getElementById('qcat').textContent=cats[q.type];
+ document.getElementById('qcount').textContent=`Question ${qi+1}/${quiz.length}`;
+ document.getElementById('qscore').textContent=`Score ${score}`;
+ document.getElementById('question').textContent=q.prompt;
+ let box=document.getElementById('answers');box.innerHTML='';
+ q.answers.forEach(a=>{
+   let b=document.createElement('button'); b.textContent=a; b.onclick=()=>answer(b,a); box.appendChild(b);
+ });
+ document.getElementById('feedback').innerHTML='';
+ document.getElementById('nextBtn').style.display='none';
+}
+function answer(btn,a){
+ if(answered)return;answered=true;let q=quiz[qi];
+ document.querySelectorAll('#answers button').forEach(b=>{
+   b.disabled=true;
+   if(b.textContent===q.correct)b.classList.add('correct');
+ });
+ if(a===q.correct){score++; lifetime+=3; btn.classList.add('correct')}
+ else{btn.classList.add('wrong')}
+ let safe = q.p.conf.toLowerCase().includes('dangereuse') || q.p.conf.toLowerCase().includes('importante');
+ document.getElementById('feedback').innerHTML=`<div class="card info">
+ <h3>${a===q.correct?'✅ Bonne réponse':'❌ À retenir'}</h3>
+ <p><b>${q.p.name}</b> <span class="latin">${q.p.latin}</span></p>
+ <h3>🌿 Repère</h3><p>${q.p.habitat}</p>
+ <h3>📜 Ethnobotanique</h3><p>${q.p.ethno}</p>
+ <h3>⚠️ Prudence</h3><p>${q.p.conf}</p>
+ ${safe?'<div class="alert" style="margin-top:12px"><b>Plante à vigilance renforcée :</b> ne jamais valider une consommation à partir du jeu seul.</div>':''}
+ </div>`;
+ localStorage.setItem('perigord_points', lifetime);
+ document.getElementById('qscore').textContent=`Score ${score}`;
+ document.getElementById('nextBtn').style.display='block';
+}
+function nextQuestion(){
+ if(qi<quiz.length-1){qi++;renderQ();window.scrollTo(0,0)}
+ else finish();
+}
+function finish(){
+ games++;localStorage.setItem('perigord_games',games);
+ document.getElementById('quiz').innerHTML=`<div class="card hero"><div class="leaf">🏆</div><h2>${score}/10</h2>
+ <p>${score>=9?'Druide du Périgord !':score>=7?'Très belle récolte de connaissances.':score>=5?'Bonne progression.':'Retour à l’herbier conseillé 🌿'}</p>
+ <p><b>${lifetime} feuilles</b> au total • ${rank()}</p>
+ <button class="primary" onclick="location.reload()">Nouvelle partie</button></div>`;
+ updateHome();
+}
+function renderList(){
+ let q=(document.getElementById('search').value||'').toLowerCase();
+ let arr=PLANTS.filter(p=>(p.name+' '+p.latin).toLowerCase().includes(q));
+ document.getElementById('plantList').innerHTML=arr.map((p,i)=>`<div class="listitem" onclick="openPlant('${p.latin.replaceAll("'","\\'")}')"><b>🌿 ${p.name}</b><br><span class="latin">${p.latin}</span></div>`).join('');
+}
+function openPlant(latin){
+ let p=PLANTS.find(x=>x.latin===latin);
+ document.getElementById('detailCard').innerHTML=`<div class="card info">
+ <h2 class="plant-title">🌿 ${p.name}</h2><div class="latin">${p.latin}</div>
+ <h3>📍 Habitat</h3><p>${p.habitat}</p>
+ <h3>🗓 Saison</h3><p>${p.season}</p>
+ <h3>🥗 Usage alimentaire traditionnel</h3><p>${p.edible}</p>
+ <h3>🌼 Usages traditionnels</h3><p>${p.trad}</p>
+ <h3>📜 Ethnobotanique</h3><p>${p.ethno}</p>
+ <h3>⚠️ Confusions / précautions</h3><div class="${p.conf.includes('DANGEREUSE')||p.conf.includes('IMPORTANTE')?'alert':'notice'}">${p.conf}</div>
+ <p class="small">Fiche pédagogique : ne constitue ni une identification suffisante pour consommer la plante, ni un conseil médical.</p>
+ </div><button style="width:100%" onclick="showScreen('encyclo')">← Retour à l’herbier</button>`;
+ showScreen('detail');
+}
+updateHome();
+</script>
+
+<script>
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const card = document.getElementById('installCard');
+  if (card) card.style.display = 'block';
+});
+window.addEventListener('appinstalled', () => {
+  const card = document.getElementById('installCard');
+  if (card) card.style.display = 'none';
+  deferredInstallPrompt = null;
+});
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('installBtn');
+  if (btn) {
+    btn.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) {
+        alert("Si le bouton d’installation n’apparaît pas, ouvre le menu ⋮ de Chrome puis choisis « Ajouter à l’écran d’accueil » ou « Installer l’application ».");
+        return;
+      }
+      deferredInstallPrompt.prompt();
+      try { await deferredInstallPrompt.userChoice; } catch(e) {}
+      deferredInstallPrompt = null;
+      const card = document.getElementById('installCard');
+      if (card) card.style.display = 'none';
+    });
+  }
+});
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+  });
+}
+</script>
+
+</body></html>

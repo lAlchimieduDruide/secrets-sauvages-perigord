@@ -1,0 +1,26 @@
+{
+  "name": "Les Secrets Sauvages du Périgord",
+  "short_name": "Secrets Sauvages",
+  "description": "Jeu ethnobotanique sur 50 plantes sauvages du Périgord.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f2e8",
+  "theme_color": "#244b34",
+  "lang": "fr-FR",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
