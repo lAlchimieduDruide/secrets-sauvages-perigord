@@ -1,4 +1,4 @@
-const CACHE = "secrets-sauvages-v2";
+const CACHE = "secrets-sauvages-v3";
 
 const ASSETS = [
   "./",
